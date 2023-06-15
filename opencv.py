@@ -5,8 +5,33 @@ import pprint
 from convert import convertframe
 import boto3
 from tempfile import gettempdir
+import PySimpleGUI as sg
 
-def detect_labels_local_file(photo,orgframe):
+def buildwindow():
+    sg.theme('Black')
+    font = ('Meiryo UI',13)
+    buttonsize = (7,1)
+    # efine the window layout
+    layout = [[sg.Text('画像解析デモ', size=(40, 1), justification='center', font='Helvetica 20')],
+              [sg.Image(filename='', key='image')],
+              [sg.Button('撮影開始',key='Record', size=buttonsize, font=font),
+            #    sg.Button('Edge',key='Edge', size=buttonsize, font=font),
+                sg.Button('Face', key='Face',size=buttonsize, font=font),
+            #    sg.Button('Eye', key='Eye',size=buttonsize, font=font),
+                # sg.Button('Circle', key='Circle',size=buttonsize, font=font),
+                # sg.Button('Square',key='Square', size=buttonsize, font=font),
+               sg.Button('Exit',key='Exit', size=buttonsize, font=font),  ],
+               [
+                #    sg.Slider(key = 'Slider',enable_events=True,size=(73,10),
+                #           range=(0,255),resolution=1,orientation='h')
+                          ]]
+
+    # ウィンドウの表示
+    window = sg.Window('画像処理・認識プログラム',
+                       layout, location=(200, 200))
+    return window
+
+def detect_labels_local_file(photo,orgframe,findlabel):
     client=boto3.client('rekognition')
     window = (1024,600)
     frame2 = cv2.resize(orgframe,window)
@@ -18,7 +43,7 @@ def detect_labels_local_file(photo,orgframe):
     print('Detected labels in ' + photo) 
     for label in labelresp['Labels']:
         print (label['Name'] + ' : ' + str(label['Instances']))
-        if label['Instances'] != None:
+        if label['Instances'] != None and label['Name'] == findlabel:
             for instance in  label['Instances']:
                 print('BoundingBox : ' + str(instance['BoundingBox']))
                 left = int(instance['BoundingBox']['Left'] * 1024)
@@ -32,30 +57,26 @@ def detect_labels_local_file(photo,orgframe):
         print ('Text is : ' + str(label['DetectedText']) + '\n' +
                str(label['DetectedText']) + str(label['Geometry']['BoundingBox']))
     # pprint.pprint(textresp['TextDetections'])
-    cv2.imshow('探知',frame2)
+    cv2.imshow('detect',frame2)
     return len(labelresp['Labels'])
 
 def main():
-    var = 0
+    window = buildwindow()
     # VideoCapture オブジェクトを取得します
     capture = cv2.VideoCapture(0)
 
   
     while(True):
+        event, values = window.read(timeout=100)
+        
+        if event == sg.WIN_CLOSED:
+            #終了ボタンが押された
+            return
         ret, frame = capture.read()
-        # resize the window
-        window = (1024,600)
-        frame1 = cv2.resize(frame,window)
-        #グレイ映像の出力
-        cv2.imshow('camera',frame1)
 
-        #キー入力で終了します
-        key = cv2.waitKey(1)
-        if key & 0xFF == ord('q'):
-            break
-        if key & 0xFF == ord('s'):
-            result = cv2.imwrite("detect.jpg",frame1)
-            detect_labels_local_file("detect.jpg",frame1)
+        if event == 'Face':
+            result = cv2.imwrite("detect.jpg",frame)
+            detect_labels_local_file("detect.jpg",frame, 'Man')
             print(result)
 #        if key & 0xFF == ord('u'):
 #            if var < 200:
@@ -63,6 +84,8 @@ def main():
 #        if key & 0xFF == ord('d'):
 #            if var > -200:
 #                var = var - 10
+        imgbytes = cv2.imencode('.png', frame)[1].tobytes()  # ditto
+        window['image'].update(data=imgbytes)
 
     capture.release()
     cv2.destroyAllWindows()
