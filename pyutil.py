@@ -45,24 +45,10 @@ def findSquares(bin_image, image, cond_area = 1000):
                 cv2.polylines(image, [rcnt], True, (0,0,255), thickness=2, lineType=cv2.LINE_8)
     return image
 
-def buildwindow():
+def buildwindow(layout):
     sg.theme('Black')
-    font = ('Meiryo UI',13)
-    buttonsize = (7,1)
+
     # efine the window layout
-    layout = [[sg.Text('画像解析デモ', size=(40, 1), justification='center', font='Helvetica 20')],
-              [sg.Image(filename='', key='image')],
-              [sg.Button('撮影開始',key='Record', size=buttonsize, font=font),
-            #    sg.Button('Edge',key='Edge', size=buttonsize, font=font),
-            #    sg.Button('Face', key='Face',size=buttonsize, font=font),
-            #    sg.Button('Eye', key='Eye',size=buttonsize, font=font),
-                # sg.Button('Circle', key='Circle',size=buttonsize, font=font),
-                # sg.Button('Square',key='Square', size=buttonsize, font=font),
-               sg.Button('Exit',key='Exit', size=buttonsize, font=font),  ],
-               [
-                #    sg.Slider(key = 'Slider',enable_events=True,size=(73,10),
-                #           range=(0,255),resolution=1,orientation='h')
-                          ]]
 
     # ウィンドウの表示
     window = sg.Window('画像処理・認識プログラム',
