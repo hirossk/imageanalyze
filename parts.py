@@ -2,7 +2,25 @@
 import math
 import cv2
 import PySimpleGUI as sg
+sg.theme('Black')
+font = ('Meiryo UI',12)
+buttonsize = (7,1)
+#画面部品の準備
+title = sg.Text('画像解析デモ', size=(40, 1), justification='center', font='Helvetica 20')
+image = sg.Image(filename='', key='image')
+recordbutton = sg.Button('撮影開始',key='Record', size=buttonsize, font=font)
+facebutton = sg.Button('顔検出', key='Face',size=buttonsize, font=font)
+eyebutton = sg.Button('目検出', key='Eye',size=buttonsize, font=font)
+edgebutton = sg.Button('エッジ',key='Edge', size=buttonsize, font=font)
+circlebutton = sg.Button('円検出', key='Circle',size=buttonsize, font=font)
+squarebutton = sg.Button('四角検出',key='Square', size=buttonsize, font=font)
+exitbutton =  sg.Button('終了',key='Exit', size=buttonsize, font=font)
+slider = sg.Slider(key = 'Slider',enable_events=True,size=(73,10),
+                   range=(0,255),resolution=1,orientation='h')
 
+#顔検出のカスケード準備
+cascadeface = cv2.CascadeClassifier("haarcascades\\haarcascade_frontalface_alt.xml")
+cascadeeye = cv2.CascadeClassifier("haarcascades\\haarcascade_eye_tree_eyeglasses.xml")
 # pt0-> pt1およびpt0-> pt2からの
 # ベクトル間の角度の余弦(コサイン)を算出
 def angle(pt1, pt2, pt0) -> float:
@@ -47,10 +65,9 @@ def findSquares(bin_image, image, cond_area = 1000):
 
 def buildwindow(layout):
     sg.theme('Black')
-
     # efine the window layout
 
     # ウィンドウの表示
     window = sg.Window('画像処理・認識プログラム',
-                       layout, location=(200, 200))
+                       layout, location=(200, 100))
     return window

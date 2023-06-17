@@ -1,4 +1,8 @@
 {
     "editor.fontFamily": "Cica",
-    "editor.codeLensFontFamily": "Cica"
+    "editor.codeLensFontFamily": "Cica",
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.autopep8"
+    },
+    "python.formatting.provider": "none"
 }
