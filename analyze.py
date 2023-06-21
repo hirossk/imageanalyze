@@ -21,40 +21,56 @@ layout = [  [title],
              labelbutton,
             exitbutton,
             facebutton,
-            textbutton],
+            celebbutton,
+            textbutton,
+            transbutton],
             [slider]]
 
-def detect_faces(orgframe):
-    frame,photoimg = com_image(photo,orgframe)
+frame = (DIMW,DIMH)
 
-    #顔からデータの取り出し
+
+
+def detect_faces():
+    imgframe,photoimg = com_image(photo,frame)
+
+    #顔に関するデータの取り出し
     faceresp = rekognition.detect_faces(Image={ 'Bytes': photoimg},Attributes=['ALL'])
 
-    drawfacebox(faceresp,frame)
-    cv2.imshow('detect',frame)
+    drawfacebox(faceresp,imgframe)
+    cv2.imshow('detect',imgframe)
 
-def detect_text(orgframe):
-    frame,photoimg = com_image(photo,orgframe)
+def detect_text():
+    imgframe,photoimg = com_image(photo,frame)
         #写真からテキストデータの取り出し
     textresp = rekognition.detect_text(Image={'Bytes': photoimg})
 
-    drawtextbox(textresp,frame,20)
+    drawtextbox(textresp,imgframe,20)
 
+    cv2.imshow('detect',imgframe)
+
+    return textresp,imgframe
+
+
+def transtext():
+    textresp,imgframe = detect_text()
     
-    #         #翻訳機能の呼び出し
-    #         response = translate.translate_text(
-    #             Text=label['DetectedText'],
-    #             SourceLanguageCode=SRC_LANG,
-    #             TargetLanguageCode=TRG_LANG
-    #             )
-    #         print( response )
-    #         # cv2.putText(frame2,text=response['TranslatedText'],org=(left, top),  fontScale=5,color=(255,255,255))
-    #         frame = putText(frame, response['TranslatedText'], (left,top+25), 20, (25, 131, 255))
+    #文字列（テキストが見つかった時）
+    for label in textresp['TextDetections']:
+        boundingbox = label['Geometry']['BoundingBox']
+        if len(str(label['DetectedText'])) > 20:
+            #翻訳機能の呼び出し
+            response = translate.translate_text(
+                Text=label['DetectedText'],
+                SourceLanguageCode=SRC_LANG,
+                TargetLanguageCode=TRG_LANG
+                )
+            left,top,_,_=getDim(boundingbox)
+            imgframe = putText(imgframe, response['TranslatedText'], (left,top+25), 20, (25, 131, 255))
 
-    cv2.imshow('detect',frame)
+    cv2.imshow('detect',imgframe)
 
-def detect_labels(orgframe):
-    frame,photoimg = com_image(photo,orgframe)
+def detect_labels():
+    imgframe,photoimg = com_image(photo,frame)
     #ラベルデータの取り出し
     labelresp = rekognition.detect_labels(Image={'Bytes': photoimg})
 
@@ -62,15 +78,17 @@ def detect_labels(orgframe):
     top = 5
     for label in labelresp['Labels']:
         str = "{Name:20}:{Confidence:.2f}%".format(**label)
-        frame = putText(frame, str, (10,top), 20, (25, 131, 255))
+        imgframe = putText(imgframe, str, (10,top), 20, (25, 131, 255))
         top = top + 25
 
-    cv2.imshow('detect',frame)
+    cv2.imshow('detect',imgframe)
 
 def main():
+    global frame
+    recordingflg=False
     window = buildwindow(layout)
     # VideoCapture オブジェクトを取得します
-    capture = cv2.VideoCapture(0)
+
  
     while(True):
         event, values = window.read(timeout=30)
@@ -79,16 +97,28 @@ def main():
             #終了ボタンが押された
             break
         
-        #カメラから画像読み込み
-        _, frame = capture.read()
-
         if event == 'Face':
-            detect_faces(frame)
+            detect_faces()
         if event == 'Label':
-            detect_labels(frame)
+            detect_labels()
         if event == 'Text':
-            detect_text(frame)
-        #画面にイメージを出力する
+            detect_text()
+        if event == 'Trans':
+            transtext()
+
+        if event == 'Record':
+            #カメラから画像読み込み
+            recordingflg = not recordingflg
+            window['Record'].update(text='撮影中' if recordingflg else '撮影開始',
+                        button_color='white on red' if recordingflg else 'black on white')
+            if recordingflg == True:
+                    capture = cv2.VideoCapture(0)
+            else:
+                #カメラによる撮影を終了する
+                frame = np.full((1, 1), 0)
+                capture.release()
+        if recordingflg == True:
+            _, frame = capture.read()
         imgbytes = cv2.imencode('.png', frame)[1].tobytes()  
         window['image'].update(data=imgbytes)
 

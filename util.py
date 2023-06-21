@@ -4,20 +4,22 @@ import PySimpleGUI as sg
 import cv2
 
 sg.theme('Black')
-font = ('Meiryo UI',12)
-buttonsize = (7,1)
+font = ('Meiryo UI',11)
+buttonsize = (8,1)
+pad=((7,7),(2,2))
 #画面部品の準備
 title = sg.Text('画像解析デモ', size=(40, 1), justification='center', font='Helvetica 20')
 image = sg.Image(filename='', key='image')
-recordbutton = sg.Button('撮影開始',key='Record', size=buttonsize, font=font)
-facebutton = sg.Button('顔検出', key='Face',size=buttonsize, font=font)
-labelbutton = sg.Button('物体検出', key='Label',size=buttonsize, font=font)
-textbutton = sg.Button('テキスト',key='Text', size=buttonsize, font=font)
-circlebutton = sg.Button('円検出', key='Circle',size=buttonsize, font=font)
-squarebutton = sg.Button('四角検出',key='Square', size=buttonsize, font=font)
-exitbutton =  sg.Button('終了',key='Exit', size=buttonsize, font=font)
+recordbutton = sg.Button('撮影開始',key='Record', size=buttonsize,pad=pad, font=font)
+facebutton = sg.Button('顔検出', key='Face',size=buttonsize,pad=pad, font=font)
+labelbutton = sg.Button('ラベル検出', key='Label',size=buttonsize,pad=pad, font=font)
+textbutton = sg.Button('テキスト',key='Text', size=buttonsize,pad=pad, font=font)
+celebbutton = sg.Button('有名人検出', key='Celeb',size=buttonsize,pad=pad, font=font)
+transbutton = sg.Button('翻訳',key='Trans', size=buttonsize,pad=pad, font=font)
+exitbutton =  sg.Button('終了',key='Exit', size=buttonsize,pad=pad, font=font)
 slider = sg.Slider(key = 'Slider',enable_events=True,size=(73,10),
                    range=(0,255),resolution=1,orientation='h')
+
 
 DIMW=800
 DIMH=600
@@ -35,7 +37,7 @@ def com_image(photo,frame):
 #文字列描画
 def putText(img, text, point, size, color):
     # 遊ゴシック
-    font = ImageFont.truetype('C:\\Windows\\Fonts\\cour.ttf', size)
+    font = ImageFont.truetype('C:\\Windows\\Fonts\\msgothic.ttc', size)
 
     img_pil = Image.fromarray(img)
     draw = ImageDraw.Draw(img_pil)
@@ -72,3 +74,5 @@ def drawtextbox(textresp,frame,LENGTH):
             left,top,width,height=getDim(boundingbox)
             cv2.rectangle(frame,(left,top),(width+left,height+top) , color=(0, 0, 255), thickness=2) 
 
+def drawtexttrans(textresp,frame,color=(255,255,255)):
+    pass
