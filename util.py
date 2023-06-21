@@ -1,0 +1,74 @@
+from PIL import ImageFont, ImageDraw, Image
+import numpy as np
+import PySimpleGUI as sg
+import cv2
+
+sg.theme('Black')
+font = ('Meiryo UI',12)
+buttonsize = (7,1)
+#画面部品の準備
+title = sg.Text('画像解析デモ', size=(40, 1), justification='center', font='Helvetica 20')
+image = sg.Image(filename='', key='image')
+recordbutton = sg.Button('撮影開始',key='Record', size=buttonsize, font=font)
+facebutton = sg.Button('顔検出', key='Face',size=buttonsize, font=font)
+labelbutton = sg.Button('物体検出', key='Label',size=buttonsize, font=font)
+textbutton = sg.Button('テキスト',key='Text', size=buttonsize, font=font)
+circlebutton = sg.Button('円検出', key='Circle',size=buttonsize, font=font)
+squarebutton = sg.Button('四角検出',key='Square', size=buttonsize, font=font)
+exitbutton =  sg.Button('終了',key='Exit', size=buttonsize, font=font)
+slider = sg.Slider(key = 'Slider',enable_events=True,size=(73,10),
+                   range=(0,255),resolution=1,orientation='h')
+
+DIMW=800
+DIMH=600
+window = (DIMW,DIMH)
+photo='detect.jpg'
+
+#共通前処理
+def com_image(photo,frame):
+    
+    result = cv2.imwrite(photo,frame)
+    with open(photo, 'rb') as image:
+        #カメラ画像を読み込む
+        photoimg = image.read()
+    return cv2.resize(frame,window),photoimg
+#文字列描画
+def putText(img, text, point, size, color):
+    # 遊ゴシック
+    font = ImageFont.truetype('C:\\Windows\\Fonts\\cour.ttf', size)
+
+    img_pil = Image.fromarray(img)
+    draw = ImageDraw.Draw(img_pil)
+
+    #テキスト描画
+    draw.text(point, text, fill=color, font=font)
+
+    #pillowからCV2で表示できる形式へ変換
+    return np.array(img_pil)
+
+def buildwindow(layout):
+    # ウィンドウの表示
+    window = sg.Window('画像処理・認識プログラム',
+                       layout, location=(200, 200))
+    return window
+
+def getDim(boundingbox):
+    left = int(boundingbox['Left'] * DIMW)
+    top = int(boundingbox['Top'] * DIMH)
+    width = int(boundingbox['Width'] * DIMW)
+    height = int(boundingbox['Height'] * DIMH)
+    return left,top,width,height
+
+def drawfacebox(faceresp,frame):
+    for label in faceresp['FaceDetails']:
+        boundingbox = label['BoundingBox']
+        left,top,width,height=getDim(boundingbox)
+        cv2.rectangle(frame,(left,top),(width+left,height+top) , color=(0, 0, 255), thickness=2) 
+
+def drawtextbox(textresp,frame,LENGTH):
+    for label in textresp['TextDetections']:
+        boundingbox = label['Geometry']['BoundingBox']
+        if len(str(label['DetectedText'])) > LENGTH:
+            left,top,width,height=getDim(boundingbox)
+            cv2.rectangle(frame,(left,top),(width+left,height+top) , color=(0, 0, 255), thickness=2) 
+
