@@ -1,8 +1,8 @@
 import cv2
 import boto3
-from tempfile import gettempdir
 import PySimpleGUI as sg
 from util import *
+from pprint import pprint
 
 #東京リージョン
 REGION = 'ap-northeast-1'
@@ -23,8 +23,8 @@ layout = [  [title],
             facebutton,
             celebbutton,
             textbutton,
-            transbutton],
-            [slider]]
+            transbutton]
+            ]
 
 frame = (DIMW,DIMH)
 
@@ -51,7 +51,7 @@ def detect_text():
     return textresp,imgframe
 
 
-def transtext():
+def trans_text():
     textresp,imgframe = detect_text()
     
     #文字列（テキストが見つかった時）
@@ -83,6 +83,27 @@ def detect_labels():
 
     cv2.imshow('detect',imgframe)
 
+def detect_celeb():
+    imgframe,photoimg = com_image(photo,frame)
+    #ラベルデータの取り出し
+    celebresp = rekognition.recognize_celebrities(Image={'Bytes': photoimg})
+
+    for celeb in celebresp['CelebrityFaces']:
+        print("Celebrity")
+        pprint(celeb)
+    for face in celebresp['UnrecognizedFaces']:
+        print("Face")
+        pprint(face)
+
+    # 解析から返ってきたデータからラベル名(Name)と確度(Confidence)を整形して出力
+    # top = 5
+    # for label in labelresp['Labels']:
+    #     str = "{Name:20}:{Confidence:.2f}%".format(**label)
+    #     imgframe = putText(imgframe, str, (10,top), 20, (25, 131, 255))
+    #     top = top + 25
+
+    # cv2.imshow('detect',imgframe)
+
 def main():
     global frame
     recordingflg=False
@@ -91,7 +112,7 @@ def main():
 
  
     while(True):
-        event, values = window.read(timeout=30)
+        event, _ = window.read(timeout=30)
         
         if event == sg.WIN_CLOSED or event == 'Exit':
             #終了ボタンが押された
@@ -104,7 +125,9 @@ def main():
         if event == 'Text':
             detect_text()
         if event == 'Trans':
-            transtext()
+            trans_text()
+        if event == 'Celeb':
+            detect_celeb()
 
         if event == 'Record':
             #カメラから画像読み込み
