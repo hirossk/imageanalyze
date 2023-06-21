@@ -2,15 +2,11 @@
 import PySimpleGUI as sg
 import numpy as np
 import cv2
-from parts import findSquares
-from parts import buildwindow
-from parts import cascadeeye
-from parts import cascadeface
-import parts
+from parts import *
 
 # 画面レイアウトの作成
-layout = [[parts.title],
-          [parts.image],
+layout = [[title],
+          [image],
           #ここにボタンを追加する
           ]
 
