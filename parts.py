@@ -13,7 +13,7 @@ facebutton = sg.Button('顔検出', key='Face',size=buttonsize, font=font)
 eyebutton = sg.Button('目検出', key='Eye',size=buttonsize, font=font)
 edgebutton = sg.Button('エッジ',key='Edge', size=buttonsize, font=font)
 circlebutton = sg.Button('円検出', key='Circle',size=buttonsize, font=font)
-squarebutton = sg.Button('四角検出',key='Square', size=buttonsize, font=font)
+rectbutton = sg.Button('四角検出',key='Rect', size=buttonsize, font=font)
 exitbutton =  sg.Button('終了',key='Exit', size=buttonsize, font=font)
 slider = sg.Slider(key = 'Slider',enable_events=True,size=(73,10),
                    range=(0,255),resolution=1,orientation='h')
@@ -32,7 +32,7 @@ def angle(pt1, pt2, pt0) -> float:
     return (dx1*dx2 + dy1*dy2)/ v
 
 # 画像上の四角形を検出
-def findSquares(bin_image, image, cond_area = 1000):
+def findRect(bin_image, image, cond_area = 1000):
     # 輪郭取得
     contours, _ = cv2.findContours(bin_image, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
