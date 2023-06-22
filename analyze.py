@@ -17,18 +17,17 @@ translate = boto3.client('translate', region_name=REGION)
     # ウィンドウレイアウトの作成
 layout = [  [title],
             [image],
+            #各種ボタンの追加
             [recordbutton,
+             exitbutton,
              labelbutton,
-            exitbutton,
-            facebutton,
-            celebbutton,
-            textbutton,
-            transbutton]
+             facebutton,
+             celebbutton,
+             textbutton,
+             transbutton]
             ]
 
 frame = (DIMW,DIMH)
-
-
 
 def detect_faces():
     imgframe,photoimg = com_image(photo,frame)
@@ -37,7 +36,13 @@ def detect_faces():
     faceresp = rekognition.detect_faces(Image={ 'Bytes': photoimg},Attributes=['ALL'])
 
     drawfacebox(faceresp,imgframe)
-    cv2.imshow('detect',imgframe)
+    #顔から年齢を推定してみましょう
+    #outputjson("face.json",faceresp)
+    #text = str(faceresp['FaceDetails'][0][''])
+    #print(text)
+    #imgframe = putText(imgframe,text, (0,20), 25,(0,255,0))
+    #cv2.imshow('detect',imgframe)
+
 
 def detect_text():
     imgframe,photoimg = com_image(photo,frame)
@@ -45,7 +50,6 @@ def detect_text():
     textresp = rekognition.detect_text(Image={'Bytes': photoimg})
 
     drawtextbox(textresp,imgframe,20)
-
     cv2.imshow('detect',imgframe)
 
     return textresp,imgframe
@@ -65,7 +69,7 @@ def trans_text():
                 TargetLanguageCode=TRG_LANG
                 )
             left,top,_,_=getDim(boundingbox)
-            imgframe = putText(imgframe, response['TranslatedText'], (left,top+25), 20, (25, 131, 255))
+            imgframe = putText(imgframe, response['TranslatedText'], (left,top+25), 25, (25, 131, 255))
 
     cv2.imshow('detect',imgframe)
 
@@ -78,7 +82,7 @@ def detect_labels():
     top = 5
     for label in labelresp['Labels']:
         str = "{Name:20}:{Confidence:.2f}%".format(**label)
-        imgframe = putText(imgframe, str, (10,top), 20, (25, 131, 255))
+        imgframe = putText(imgframe, str, (10,top), 25, (25, 131, 255))
         top = top + 25
 
     cv2.imshow('detect',imgframe)
@@ -99,7 +103,7 @@ def detect_celeb():
     # top = 5
     # for label in labelresp['Labels']:
     #     str = "{Name:20}:{Confidence:.2f}%".format(**label)
-    #     imgframe = putText(imgframe, str, (10,top), 20, (25, 131, 255))
+    #     imgframe = putText(imgframe, str, (10,top), 25, (25, 131, 255))
     #     top = top + 25
 
     # cv2.imshow('detect',imgframe)
@@ -118,6 +122,7 @@ def main():
             #終了ボタンが押された
             break
         
+        #各種機能の追加
         if event == 'Face':
             detect_faces()
         if event == 'Label':
