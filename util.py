@@ -2,6 +2,7 @@ from PIL import ImageFont, ImageDraw, Image
 import numpy as np
 import PySimpleGUI as sg
 import cv2
+import json
 
 sg.theme('Black')
 font = ('Meiryo UI',11)
@@ -37,13 +38,13 @@ def com_image(photo,frame):
 #文字列描画
 def putText(img, text, point, size, color):
     # 遊ゴシック
-    font = ImageFont.truetype('C:\\Windows\\Fonts\\msgothic.ttc', size)
+    font = ImageFont.truetype('C:\\Windows\\Fonts\\msgothic.ttc', size,index=0)
 
     img_pil = Image.fromarray(img)
     draw = ImageDraw.Draw(img_pil)
 
     #テキスト描画
-    draw.text(point, text, fill=color, font=font)
+    draw.text(point, text, fill=color, font=font,)
 
     #pillowからCV2で表示できる形式へ変換
     return np.array(img_pil)
@@ -75,4 +76,10 @@ def drawtextbox(textresp,frame,LENGTH):
             cv2.rectangle(frame,(left,top),(width+left,height+top) , color=(0, 0, 255), thickness=2) 
 
 def drawtexttrans(textresp,frame,color=(255,255,255)):
+    pass
+
+def outputjson(filename,contents):
+    f = open(filename, 'w', encoding='UTF-8')
+    json.dump(contents, f, ensure_ascii=False, 
+              indent=4, sort_keys=True, separators=(',', ': '))
     pass
