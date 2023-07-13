@@ -82,8 +82,8 @@ def label_detect():
 
     for label in labelresp['Labels']:
         str = "{Name:20}:{Confidence:.2f}%".format(**label)
-        imgframe = putText(imgframe, str, (10,top), 45, (25, 0, 255))
-        top = top + 45
+        imgframe = putText(imgframe, str, (10,top), 25, (25, 131, 255))
+        top = top + 25
 
     cv2.imshow('detect',imgframe)
 

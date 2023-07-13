@@ -22,7 +22,7 @@ slider = sg.Slider(key = 'slider',enable_events=True,size=(73,10),
                    range=(0,255),resolution=1,orientation='h')
 
 
-DIMW=1024
+DIMW=800
 DIMH=600
 window = (DIMW,DIMH)
 photo='detect.jpg'
