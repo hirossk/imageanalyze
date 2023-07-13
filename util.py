@@ -11,14 +11,14 @@ pad=((7,7),(2,2))
 #画面部品の準備
 title = sg.Text('画像解析デモ', size=(40, 1), justification='center', font='Helvetica 20')
 image = sg.Image(filename='', key='image')
-recordbutton = sg.Button('撮影開始',key='Record', size=buttonsize,pad=pad, font=font)
-facebutton = sg.Button('顔検出', key='Face',size=buttonsize,pad=pad, font=font)
-labelbutton = sg.Button('物体検出', key='Label',size=buttonsize,pad=pad, font=font)
-textbutton = sg.Button('テキスト',key='Text', size=buttonsize,pad=pad, font=font)
-celebbutton = sg.Button('有名人検出', key='Celeb',size=buttonsize,pad=pad, font=font)
-transbutton = sg.Button('翻訳',key='Trans', size=buttonsize,pad=pad, font=font)
-exitbutton =  sg.Button('終了',key='Exit', size=buttonsize,pad=pad, font=font)
-slider = sg.Slider(key = 'Slider',enable_events=True,size=(73,10),
+recordbutton = sg.Button('撮影開始',key='record', size=buttonsize,pad=pad, font=font)
+facebutton = sg.Button('顔検出', key='face',size=buttonsize,pad=pad, font=font)
+labelbutton = sg.Button('物体検出', key='label',size=buttonsize,pad=pad, font=font)
+textbutton = sg.Button('テキスト',key='text', size=buttonsize,pad=pad, font=font)
+celebbutton = sg.Button('有名人検出', key='celeb',size=buttonsize,pad=pad, font=font)
+transbutton = sg.Button('翻訳',key='trans', size=buttonsize,pad=pad, font=font)
+exitbutton =  sg.Button('終了',key='exit', size=buttonsize,pad=pad, font=font)
+slider = sg.Slider(key = 'slider',enable_events=True,size=(73,10),
                    range=(0,255),resolution=1,orientation='h')
 
 
