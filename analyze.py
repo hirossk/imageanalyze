@@ -23,7 +23,7 @@ layout = [  [title],
 
 frame = (DIMW,DIMH)
 
-def detect_faces():
+def face_detect():
     imgframe,photoimg = com_image(photo,frame)
 
     #顔に関するデータの取り出し
@@ -31,14 +31,14 @@ def detect_faces():
     drawfacebox(faceresp,imgframe)
 
     #顔から年齢を推定してみましょう
-    # if len(faceresp['FaceDetails']) > 0:
-    #      outputjson("face.json",faceresp)
+    if len(faceresp['FaceDetails']) > 0:
+         outputjson("face.json",faceresp)
 
     # text = str(faceresp['FaceDetails'][0][''])
     # imgframe = putText(imgframe,text, (0,20), 25,(0,255,0))
     # cv2.imshow('detect',imgframe)
 
-def detect_text():
+def text_detect():
     imgframe,photoimg = com_image(photo,frame)
     
     #写真からテキストデータの取り出し
@@ -49,8 +49,8 @@ def detect_text():
 
     return textresp,imgframe
 
-def trans_text():
-    textresp,imgframe = detect_text()
+def text_trans():
+    textresp,imgframe = text_detect()
     
     #文字列（テキストが見つかった時）
     for label in textresp['TextDetections']:
@@ -71,7 +71,7 @@ def trans_text():
 
     cv2.imshow('detect',imgframe)
 
-def detect_labels():
+def label_detect():
     imgframe,photoimg = com_image(photo,frame)
 
     #ラベルデータの取り出し
@@ -82,12 +82,12 @@ def detect_labels():
 
     for label in labelresp['Labels']:
         str = "{Name:20}:{Confidence:.2f}%".format(**label)
-        imgframe = putText(imgframe, str, (10,top), 25, (25, 131, 255))
-        top = top + 25
+        imgframe = putText(imgframe, str, (10,top), 45, (25, 0, 255))
+        top = top + 45
 
     cv2.imshow('detect',imgframe)
 
-def detect_celeb():
+def celeb_detect():
     imgframe,photoimg = com_image(photo,frame)
 
     #ラベルデータの取り出し
@@ -110,18 +110,17 @@ def main():
  
     while(True):
         event, _ = window.read(timeout=30)
-        
-        if event == sg.WIN_CLOSED or event == 'Exit':
+
+        if event == sg.WIN_CLOSED or event == 'exit':
             #終了ボタンが押された
             break
-        
+
         #各種機能の追加
 
-
-        if event == 'Record':
+        if event == 'record':
             #カメラから画像読み込み
             recordingflg = not recordingflg
-            window['Record'].update(text='撮影中' if recordingflg else '撮影開始',
+            window['record'].update(text='撮影中' if recordingflg else '撮影開始',
                         button_color='white on red' if recordingflg else 'black on white')
             if recordingflg == True:
                     capture = cv2.VideoCapture(0)
