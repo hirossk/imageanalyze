@@ -31,8 +31,8 @@ def face_detect():
     drawfacebox(faceresp,imgframe)
 
     #顔から年齢を推定してみましょう
-    if len(faceresp['FaceDetails']) > 0:
-         outputjson("face.json",faceresp)
+    # if len(faceresp['FaceDetails']) > 0:
+    #     outputjson("face.json",faceresp)
 
     # text = str(faceresp['FaceDetails'][0][''])
     # imgframe = putText(imgframe,text, (0,20), 25,(0,255,0))
@@ -44,8 +44,8 @@ def text_detect():
     #写真からテキストデータの取り出し
     textresp = rekognition.detect_text(Image={'Bytes': photoimg})
 
-    drawtextbox(textresp,imgframe,20)
-    cv2.imshow('detect',imgframe)
+    # drawtextbox(textresp,imgframe,20)
+    # cv2.imshow('detect',imgframe)
 
     return textresp,imgframe
 
