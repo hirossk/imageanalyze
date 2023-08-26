@@ -94,13 +94,13 @@ def celeb_detect():
     celebresp = rekognition.recognize_celebrities(Image={'Bytes': photoimg})
 
     # if len(celebresp['CelebrityFaces']) > 0:
-    #     outputjson("celeb.json",celebresp)
+    #    outputjson("celeb.json",celebresp)
 
-    #     boundingbox = celebresp['CelebrityFaces'][0]['Face']['BoundingBox']
-    #     left,top,_,_=getDim(boundingbox)
-    #     text = celebresp['CelebrityFaces'][0]['Name']
-    #     imgframe = putText(imgframe, text, (left,top), 25, (25, 131, 255))
-
+    #     for celeb in celebresp['CelebrityFaces']:
+    #         boundingbox = celeb['Face']['BoundingBox']
+    #         left,top,_,_=getDim(boundingbox)
+    #         text = celeb['Name']
+    #         imgframe = putText(imgframe, text, (left,top), 25, (25, 131, 255))
     #     cv2.imshow('detect',imgframe)
     
 def main():
