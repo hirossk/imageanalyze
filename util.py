@@ -38,7 +38,7 @@ def com_image(photo,frame):
 #文字列描画
 def putText(img, text, point, size, color):
     # 遊ゴシック
-    font = ImageFont.truetype('C:\\Windows\\Fonts\\msgothic.ttc', size,index=0)
+    font = ImageFont.truetype('fonts\\NotoSansCJK.ttc', size,index=0)
 
     img_pil = Image.fromarray(img)
     draw = ImageDraw.Draw(img_pil)
