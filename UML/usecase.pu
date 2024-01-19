@@ -1,0 +1,10 @@
+@startuml
+left to right direction
+actor 契約担当者
+rectangle 翻訳システム{
+    契約担当者 --> ("ファイル指定")
+    契約担当者 --> ("翻訳")
+    契約担当者 --> ("保存")
+}
+
+@enduml

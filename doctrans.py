@@ -16,7 +16,7 @@ import os
 cwd = os.getcwd() + "\\"
 
 #Wordを起動する : Applicationオブジェクトを生成する
-# Application=win32com.client.Dispatch("Word.Application")
+Application=win32com.client.Dispatch("Word.Application")
 
 #東京リージョン
 REGION = 'ap-northeast-1'
@@ -27,12 +27,22 @@ TRG_LANG = 'ja'
 translate = boto3.client('translate', region_name=REGION)
 
 layout = [
+   [sg.Text("英語で書かれているwordの文書を選択してください")],
    [sg.Text("ファイル"), sg.InputText(), sg.FileBrowse(key="file1",button_text="ファイル選択")],
-   [sg.Submit("翻訳"), sg.Cancel("キャンセル")],
+   [sg.Submit("翻訳"), sg.Submit("保存"), sg.Cancel("終了")],
 ]
-
+# layout = [
+#    [sg.Text("英語で書かれているwordの文書を選択してください")],
+#    [sg.Text("ファイル"), sg.InputText(), sg.FileBrowse(key="file1",button_text="ファイル選択")],
+#    [sg.Submit("翻訳"), sg.Submit("保存"), sg.Submit("表示"), sg.Submit("印刷"), sg.Cancel("修了")],
+# ]
+# layout = [
+#    [sg.Text("英語で書かれているwordの文書を選択してください")],
+#    [sg.Text("ファイル"), sg.InputText(), sg.FileBrowse(key="file1",button_text="ファイル選択")],
+#    [sg.Submit("翻訳"), sg.Submit("保存"), sg.Submit("表示"), sg.Submit("印刷"), sg.Cancel("修了")],
+# ]
 #ファイル選択用画面の表示
-window = sg.Window("ファイル選択", layout)
+window = sg.Window("ファイル選択", layout,disable_close=True)
 
 #ファイルを読み込む
 event, values = window.read()
@@ -55,32 +65,38 @@ if event == "翻訳":
             #変換結果をコンソールに出力する
             print(response['TranslatedText'])
             #誤変換をリプレイスする（本当は辞書登録が望ましい）
-            paragraph.text = response['TranslatedText'].replace('証人', '本契約').replace('一方、', '')
+            paragraph.text = response['TranslatedText'].replace('証人', '本契約') \
+                .replace('一方、', '').replace('扇州','扇子')
         
         #翻訳後の文を段落に追加する
         newdoc.add_paragraph(paragraph.text)
         #文字の配置を元の文章に合わせる
         newdoc.paragraphs[-1].alignment = paragraph.alignment
+elif event == "キャンセル":
+    exit()
 
-#wordファイルの保存を行う　コメント①
-# newdoc.save(cwd + "翻訳結果.docx")
-#作成したwordファイルを表示　コメント②
-# Application.Documents.Open(cwd + "翻訳結果.docx")
-# Application.Visible=True
 
-#pdfへ変換する　コメント③
-# convert(cwd + "翻訳結果.docx")
-
-#acrobat.exe 保管場所　コメント③
-# acr_path = "C:/Program Files/Adobe/Acrobat DC/Acrobat/Acrobat.exe"
-
-#acrobatで変換後のPDFを表示する　コメント③
-# pdf_pro = subprocess.Popen([acr_path,cwd + "翻訳結果.pdf"], shell=False)
 
 while True:  # Event Loop
     event, values = window.read()
-    if event == "キャンセル":
+    if event == "終了":
         break
+    if event == "保存":
+        #wordファイルの保存を行う　コメント①
+        newdoc.save(cwd + "翻訳結果.docx")
+    if event == "表示":
+        #作成したwordファイルを表示　コメント②
+        Application.Documents.Open(cwd + "翻訳結果.docx")
+        Application.Visible=True
+    if event == "印刷":
+        #pdfへ変換する　コメント③
+        convert(cwd + "翻訳結果.docx")
+
+        #acrobat.exe 保管場所　コメント③
+        acr_path = "C:/Program Files/Adobe/Acrobat DC/Acrobat/Acrobat.exe"
+
+        #acrobatで変換後のPDFを表示する　コメント③
+        pdf_pro = subprocess.Popen([acr_path,cwd + "翻訳結果.pdf"], shell=False)
 
 #acrobatを終了する　コメント③
 # pdf_pro.kill()

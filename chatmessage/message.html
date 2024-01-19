@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link type="text/css" rel="stylesheet" href="bmesse.css" />
+    <title>message</title>
+</head>
+<body>
+    <!-- 自分やユーザーの情報 -->
+    <h3 id="me" user_id="1">あなたはユーザー1です</h3>
+    <h3 id="partner" thread_id="1">相手</h3>
+    <div id="users">
+        <button class="user" user_id="2">ユーザー2</button>
+    </div>
+    <br>
+    <div id="your_container">
+
+        <!-- チャットの外側部分① -->
+        <div id="bms_messages_container">
+            <!-- ヘッダー部分② -->
+            <div id="bms_chat_header">
+                <!--ステータス-->
+                <div id="bms_chat_user_status">
+                    <!--ステータスアイコン-->
+                    <div id="bms_status_icon">●</div>
+                    <!--ユーザー名-->
+                    <div id="bms_chat_user_name">ユーザー</div>
+                </div>
+            </div>
+
+            <!-- タイムライン部分③ -->
+            <div id="bms_messages">
+
+                <!--メッセージ１（左側）-->
+                <div class="bms_message bms_left">
+                    <div class="bms_message_box">
+                        <div class="bms_message_content">
+                            <div class="bms_message_text">
+                                うちの会社もそろそろ海外展開を準備していますが、契約をするために翻訳を専門にやっている外部の会社に依頼をしていて大変です
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bms_clear"></div><!-- 回り込みを解除（スタイルはcssで充てる） -->
+                <div class="bms_message bms_left">
+                    <div class="bms_message_box">
+                        <div class="bms_message_content">
+                            <div class="bms_message_text">
+                                英文と日本語の翻訳を行っていて大変時間とコストがかかっています
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--メッセージ２（右側）-->
+                <div class="bms_message bms_right">
+                    <div class="bms_message_box">
+                        <div class="bms_message_content">
+                            <div class="bms_message_text">出来るだけリアルタイムかつコスト下げる方法はないかな</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bms_clear"></div><!-- 回り込みを解除（スタイルはcssで充てる） -->
+                <div class="bms_message bms_left">
+                    <div class="bms_message_box">
+                        <div class="bms_message_content">
+                            <div class="bms_message_text">
+                                今はオンラインによる取引が多いのでシステム化できないか相談してみたいと思います
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bms_message bms_right">
+                    <div class="bms_message_box">
+                        <div class="bms_message_content">
+                            <div class="bms_message_text">どこに相談するんですか？</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bms_message bms_left">
+                    <div class="bms_message_box">
+                        <div class="bms_message_content">
+                            <div class="bms_message_text">
+                                システム開発を行っている企業に知り合いがいるのでその人に聞いてみる予定です
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bms_message bms_right">
+                    <div class="bms_message_box">
+                        <div class="bms_message_content">
+                            <div class="bms_message_text">分かりました。お願いします</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- テキストボックス、送信ボタン④ -->
+            <div id="bms_send">
+                <textarea id="bms_send_message"></textarea>
+                <div id="bms_send_btn">送信</div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
