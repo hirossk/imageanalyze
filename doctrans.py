@@ -34,12 +34,12 @@ layout = [
 # layout = [
 #    [sg.Text("英語で書かれているwordの文書を選択してください")],
 #    [sg.Text("ファイル"), sg.InputText(), sg.FileBrowse(key="file1",button_text="ファイル選択")],
-#    [sg.Submit("翻訳"), sg.Submit("保存"), sg.Submit("表示"), sg.Submit("印刷"), sg.Cancel("修了")],
+#    [sg.Submit("翻訳"), sg.Submit("保存"), sg.Submit("表示"), sg.Cancel("終了")],
 # ]
 # layout = [
 #    [sg.Text("英語で書かれているwordの文書を選択してください")],
 #    [sg.Text("ファイル"), sg.InputText(), sg.FileBrowse(key="file1",button_text="ファイル選択")],
-#    [sg.Submit("翻訳"), sg.Submit("保存"), sg.Submit("表示"), sg.Submit("印刷"), sg.Cancel("修了")],
+#    [sg.Submit("翻訳"), sg.Submit("保存"), sg.Submit("表示"), sg.Submit("印刷"), sg.Cancel("終了")],
 # ]
 #ファイル選択用画面の表示
 window = sg.Window("ファイル選択", layout,disable_close=True)
