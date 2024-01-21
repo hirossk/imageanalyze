@@ -29,12 +29,6 @@ layout = [
    [sg.Text("ファイル"), sg.InputText(), sg.FileBrowse(key="file1",button_text="ファイル選択")],
    [sg.Submit("翻訳"), sg.Submit("保存"), sg.Cancel("終了")],
 ]
-#保存バージョン（翻訳・保存）
-#layout = [
-#   [sg.Text("英語で書かれているwordの文書を選択してください")],
-#   [sg.Text("ファイル"), sg.InputText(), sg.FileBrowse(key="file1",button_text="ファイル選択")],
-#   [sg.Submit("翻訳"), sg.Submit("保存"), sg.Cancel("終了")],
-#]
 #表示バージョン（翻訳・保存・表示）
 # layout = [
 #    [sg.Text("英語で書かれているwordの文書を選択してください")],
