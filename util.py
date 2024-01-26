@@ -125,7 +125,6 @@ def call_polly(speed = 85,ntts = 'Kazuha'):
         # at the end of the with statement's scope.
             with closing(response["AudioStream"]) as stream:
                 output = os.path.join(gettempdir(), "speech.mp3")
-                print(response["AudioStream"])
                 try:
                     # Open a file for writing the output as a binary stream
                         with open(output, "wb") as file:
@@ -134,14 +133,12 @@ def call_polly(speed = 85,ntts = 'Kazuha'):
                     # Could not write to file, exit gracefully
                     print(error)
                     sys.exit(-1)
-                print(output)
     else:
         # The response didn't contain audio data, exit gracefully
         print("Could not stream audio")
         sys.exit(-1)
     # Play the audio using the platform's default player
     if sys.platform == "win32":
-        print(output)
         os.startfile(output)
     else:
         # The following works on macOS and Linux. (Darwin = mac, xdg-open = linux).
