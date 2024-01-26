@@ -10,10 +10,14 @@ import os
 import sys
 import subprocess
 from tempfile import gettempdir
+import re
+import pprint
 
 #東京リージョン
 REGION = 'ap-northeast-1'
 polly = boto3.client('polly', region_name=REGION)
+bedrock = boto3.client('bedrock', region_name='us-east-1')
+bedrock_runtime = boto3.client('bedrock-runtime', region_name='us-east-1')
 
 sg.theme('Black')
 font = ('Meiryo UI',11)
@@ -30,6 +34,7 @@ celebbutton = sg.Button('有名人検出', key='celeb',size=buttonsize,pad=pad, 
 transbutton = sg.Button('翻訳',key='trans', size=buttonsize,pad=pad, font=font)
 exitbutton =  sg.Button('終了',key='exit', size=buttonsize,pad=pad, font=font)
 pollybutton =  sg.Button('音声合成',key='polly', size=buttonsize,pad=pad, font=font)
+bedrockbutton =  sg.Button('AIchat',key='bedrock', size=buttonsize,pad=pad, font=font)
 slider = sg.Slider(key = 'slider',enable_events=True,size=(73,10),
                    range=(0,255),resolution=1,orientation='h')
 
@@ -96,22 +101,26 @@ def outputjson(filename,contents):
               indent=4, sort_keys=True, separators=(',', ': '))
     pass
 
-def call_polly(speed = 85,ntts = 'Kazuha'):
+def call_polly(speed = 85,VoiceId = 'Kazuha',filename = 'message.txt',Engine = 'neural'):
     #トークNTTS Kazuha Tomoko Takumi
     #謝辞メッセージ
-    text = '<speak><prosody rate="' + str(speed) + '%">' 
-    text = text + '私は' + ntts + 'といいます。<break time="1s"/>'
-    text = text + 'このメッセージは音声合成pollyを使っています。<break time="2s"/> ' + \
-           '今日はオープンキャンパスにお越しいただきありがとうございました。' + \
-           '今後もイベントを用意していますのでまたお越しください。 ' + \
-           'お待ちしております。'
-    text = text + "</prosody></speak>"
+    with open(filename, 'r', encoding='UTF-8') as f:
+        data = f.read(-1)
 
+    #スピードの変更や空白の挿入
+    text = '<speak><prosody rate="' + str(speed) + '%">'
+    #空白の挿入
+    data = re.sub('bt=(\d+)s','<break time="\\1s"/>',data)
+    data = re.sub('VoiceId',VoiceId,data)
+    text = text + data
+    text = text + '</prosody></speak>'
+    if Engine == '':
+        Engine = 'standard'
     try:
         # Request speech synthesis
         response = polly.synthesize_speech(Text=text, OutputFormat="mp3",
                                             TextType='ssml',
-                                            VoiceId=ntts,Engine = 'neural')
+                                            VoiceId=VoiceId,Engine=Engine)
     except (BotoCoreError, ClientError) as error:
         # The service returned an error, exit gracefully
         print(error)
@@ -144,3 +153,36 @@ def call_polly(speed = 85,ntts = 'Kazuha'):
         # The following works on macOS and Linux. (Darwin = mac, xdg-open = linux).
         opener = "open" if sys.platform == "darwin" else "xdg-open"
         subprocess.call([opener, output])
+
+def call_bedrock():
+    """
+    List the available Amazon Bedrock foundation models.
+
+    :return: The list of available bedrock foundation models.
+    """
+    f = open('questions.txt', 'r', encoding='UTF-8')
+    data = f.read(-1)
+    prompt = """Human: """ + data + """
+        
+    Assistant:"""
+    body = json.dumps(
+        {
+        "prompt": prompt,
+        "max_tokens_to_sample": 500,
+        }
+    )
+    resp = bedrock_runtime.invoke_model(
+        modelId="anthropic.claude-v2:1",
+        body=body,
+        contentType="application/json",
+        accept="application/json",
+        )
+    answer = resp["body"].read().decode()
+
+    with open('answer.txt', mode='w', encoding='UTF-8') as f:
+        f.write(json.loads(answer)["completion"])
+    
+    call_polly(filename = 'answer.txt')
+
+
+
