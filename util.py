@@ -182,7 +182,7 @@ def call_bedrock():
     with open('answer.txt', mode='w', encoding='UTF-8') as f:
         f.write(json.loads(answer)["completion"])
     
-    call_polly(filename = 'answer.txt')
+    call_polly(filename = 'answer.txt',VoiceId='Takumi')
 
 
 
