@@ -1,0 +1,4 @@
+opencv-python
+boto3
+PySimpleGUI==4.70.1
+pillow
