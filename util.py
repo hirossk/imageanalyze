@@ -154,33 +154,79 @@ def call_polly(speed = 85,VoiceId = 'Kazuha',filename = 'message.txt',Engine = '
         opener = "open" if sys.platform == "darwin" else "xdg-open"
         subprocess.call([opener, output])
 
+def invoke_model(model_id, prompt):
+    """
+    指定されたモデルIDとプロンプトでモデルを呼び出し、結果を返す関数
+
+    Args:
+        model_id (str): モデルのID
+        prompt (str): プロンプト
+
+    Returns:
+        str: モデルの生成結果
+    """
+
+    # client = boto3.client('bedrock-runtime')
+
+    body = {
+        "anthropic_version": "bedrock-2023-05-31",
+        "max_tokens": 2000,
+        "temperature": 0.7,
+        "messages": [
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
+    }
+
+    response = bedrock_runtime.invoke_model(
+        modelId=model_id,
+        body=json.dumps(body).encode('utf-8'),
+        contentType='application/json'
+    )
+    print(response)
+    response_body = json.loads(response['body'].read().decode('utf-8'))
+    return response_body
+
 def call_bedrock():
+    # モデルIDとプロンプトを設定
+    model_id = "anthropic.claude-3-haiku-20240307-v1:0"
+
+    f = open('questions.txt', 'r', encoding='UTF-8')
+    data = f.read(-1)
+    prompt = data
+
+    # モデルを呼び出し、結果を表示
+    result = invoke_model(model_id, prompt)
+    answer = result['content'][0]['text']
+
     """
     List the available Amazon Bedrock foundation models.
 
     :return: The list of available bedrock foundation models.
     """
-    f = open('questions.txt', 'r', encoding='UTF-8')
-    data = f.read(-1)
-    prompt = """Human: """ + data + """
+    # f = open('questions.txt', 'r', encoding='UTF-8')
+    # data = f.read(-1)
+    # prompt = """Human: """ + data + """
         
-    Assistant:"""
-    body = json.dumps(
-        {
-        "prompt": prompt,
-        "max_tokens_to_sample": 500,
-        }
-    )
-    resp = bedrock_runtime.invoke_model(
-        modelId="anthropic.claude-v2:1",
-        body=body,
-        contentType="application/json",
-        accept="application/json",
-        )
-    answer = resp["body"].read().decode()
+    # Assistant:"""
+    # body = json.dumps(
+    #     {
+    #     "prompt": prompt,
+    #     "max_tokens_to_sample": 500,
+    #     }
+    # )
+    # resp = bedrock_runtime.invoke_model(
+    #     modelId="anthropic.claude-3-haiku-20240307-v1:0",
+    #     body=body,
+    #     contentType="application/json",
+    #     accept="application/json",
+    #     )
+    # answer = resp["body"].read().decode()
 
     with open('answer.txt', mode='w', encoding='UTF-8') as f:
-        f.write(json.loads(answer)["completion"])
+        f.write(answer)
     
     call_polly(filename = 'answer.txt',VoiceId='Takumi')
 
