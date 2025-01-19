@@ -34,7 +34,7 @@ celebbutton = sg.Button('有名人検出', key='celeb',size=buttonsize,pad=pad, 
 transbutton = sg.Button('翻訳',key='trans', size=buttonsize,pad=pad, font=font)
 exitbutton =  sg.Button('終了',key='exit', size=buttonsize,pad=pad, font=font)
 pollybutton =  sg.Button('音声合成',key='polly', size=buttonsize,pad=pad, font=font)
-bedrockbutton =  sg.Button('AIchat',key='bedrock', size=buttonsize,pad=pad, font=font)
+bedrockbutton =  sg.Button('生成AI',key='bedrock', size=buttonsize,pad=pad, font=font)
 slider = sg.Slider(key = 'slider',enable_events=True,size=(73,10),
                    range=(0,255),resolution=1,orientation='h')
 
