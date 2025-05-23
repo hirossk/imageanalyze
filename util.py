@@ -1,6 +1,6 @@
 from PIL import ImageFont, ImageDraw, Image
 import numpy as np
-import PySimpleGUI as sg
+import TkEasyGUI as sg
 import cv2
 import json
 import boto3
@@ -19,13 +19,13 @@ polly = boto3.client('polly', region_name=REGION)
 bedrock = boto3.client('bedrock', region_name='us-east-1')
 bedrock_runtime = boto3.client('bedrock-runtime', region_name='us-east-1')
 
-sg.theme('Black')
+# sg.theme('Black')
 font = ('Meiryo UI',11)
 buttonsize = (8,1)
 pad=((7,7),(2,2))
 #画面部品の準備
-title = sg.Text('画像解析デモ', size=(40, 1), justification='center', font='Helvetica 20')
-image = sg.Image(filename='', key='image')
+title = sg.Text('画像解析デモ', size=(40, 1),  font='Helvetica 20')
+image = sg.Image(filename='', key='image', size=(640, 480))
 recordbutton = sg.Button('撮影開始',key='record', size=buttonsize,pad=pad, font=font)
 facebutton = sg.Button('顔検出', key='face',size=buttonsize,pad=pad, font=font)
 labelbutton = sg.Button('物体検出', key='label',size=buttonsize,pad=pad, font=font)

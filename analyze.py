@@ -1,6 +1,6 @@
 import cv2
 import boto3
-import PySimpleGUI as sg
+import TkEasyGUI as sg
 from util import *
 
 #東京リージョン
@@ -18,7 +18,7 @@ translate = boto3.client('translate', region_name=REGION)
 layout = [  [title],
             [image],
             #各種ボタンの追加
-            []
+            [],[exitbutton]
             ]
 
 frame = (DIMW,DIMH)
@@ -115,8 +115,6 @@ def main():
             #終了ボタンが押された
             break
 
-        #各種機能の追加
-
         if event == 'record':
             #カメラから画像読み込み
             recordingflg = not recordingflg
@@ -130,8 +128,8 @@ def main():
                 capture.release()
         if recordingflg == True:
             _, frame = capture.read()
-        imgbytes = cv2.imencode('.png', frame)[1].tobytes()  
-        window['image'].update(data=imgbytes)
+            imgbytes = cv2.imencode('.png', frame)[1].tobytes()  
+            window['image'].update(data=imgbytes)
     
     cv2.destroyAllWindows()
 
