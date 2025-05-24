@@ -18,7 +18,7 @@ translate = boto3.client('translate', region_name=REGION)
 layout = [  [title],
             [image],
             #各種ボタンの追加
-            [],[exitbutton]
+            [recordbutton,celebbutton],[exitbutton]
             ]
 
 frame = (DIMW,DIMH)
@@ -67,7 +67,7 @@ def text_trans():
             
             left,top,_,_=getDim(boundingbox)
             imgframe = putText(imgframe, response['TranslatedText'], 
-                               (left,top+25), 25, (25, 131, 255))
+                               (left,top), 25, (25, 131, 255))
 
     cv2.imshow('detect',imgframe)
 
@@ -94,7 +94,7 @@ def celeb_detect():
     celebresp = rekognition.recognize_celebrities(Image={'Bytes': photoimg})
 
     # if len(celebresp['CelebrityFaces']) > 0:
-    #    outputjson("celeb.json",celebresp)
+    #     outputjson("celeb.json",celebresp)
 
     #     for celeb in celebresp['CelebrityFaces']:
     #         boundingbox = celeb['Face']['BoundingBox']
