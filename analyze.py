@@ -115,6 +115,8 @@ def main():
             #終了ボタンが押された
             break
 
+        # 各種機能の追加
+
         if event == 'record':
             #カメラから画像読み込み
             recordingflg = not recordingflg
