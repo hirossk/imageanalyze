@@ -18,6 +18,8 @@ REGION = 'ap-northeast-1'
 polly = boto3.client('polly', region_name=REGION)
 bedrock = boto3.client('bedrock', region_name='us-east-1')
 bedrock_runtime = boto3.client('bedrock-runtime', region_name='us-east-1')
+#翻訳エンジンへの接続
+translate = boto3.client('translate', region_name=REGION)
 
 # sg.theme('Black')
 font = ('Meiryo UI',11)
@@ -52,19 +54,27 @@ def com_image(photo,frame):
         #カメラ画像を読み込む
         photoimg = image.read()
     return cv2.resize(frame,window),photoimg
-#文字列描画
-def putText(img, text, point, size, color):
-    # 遊ゴシック
-    font = ImageFont.truetype('fonts\\NotoSansCJK.ttc', size,index=0)
-
+def putText(img, text, point, size, color, font_path='fonts\\NotoSansCJK.ttc', font_index=0):
+    # テキストを画像に描画
+    if not text:
+        return img  # テキストが空の場合はそのまま画像を返す
+    font = ImageFont.truetype(font_path, size, index=font_index)
     img_pil = Image.fromarray(img)
     draw = ImageDraw.Draw(img_pil)
-
-    #テキスト描画
-    draw.text(point, text, fill=color, font=font,)
-
-    #pillowからCV2で表示できる形式へ変換
+    draw.text(point, text, fill=color, font=font)
     return np.array(img_pil)
+
+def putTextJa(img, text, point, size, color, font_path='fonts\\NotoSansCJK.ttc', font_index=0):
+    # 日本語のテキストを翻訳
+    if not text:
+        return img  # テキストが空の場合はそのまま画像を返す
+    response = translate.translate_text(
+        Text=text,
+        SourceLanguageCode='auto',
+        TargetLanguageCode='ja'
+    )
+    translated_text = response.get('TranslatedText', text)
+    return putText(img, translated_text, point, size, color, font_path, font_index)
 
 def buildwindow(layout):
     # ウィンドウの表示

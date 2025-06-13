@@ -6,7 +6,7 @@ from util import *
 #東京リージョン
 REGION = 'ap-northeast-1'
 SRC_LANG = 'auto'
-TRG_LANG = 'ja'
+TRG_LANG = 'ja' # 翻訳先はen,zh,ko,fr,itなどほかの言語もOK
 
 #画像解析のエンジンへの接続
 rekognition=boto3.client('rekognition', region_name=REGION)
@@ -82,7 +82,7 @@ def label_detect():
 
     for label in labelresp['Labels']:
         str = "{Name:20}:{Confidence:.2f}%".format(**label)
-        imgframe = putText(imgframe, str, (10,top), 25, (25, 131, 255))
+        imgframe = putText(imgframe, str, (10,top), 25, (25, 131, 255)) # 見やすい色に変更可能
         top = top + 25
 
     cv2.imshow('detect',imgframe)
