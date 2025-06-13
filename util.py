@@ -68,6 +68,10 @@ def putTextJa(img, text, point, size, color, font_path='fonts\\NotoSansCJK.ttc',
     # 日本語のテキストを翻訳
     if not text:
         return img  # テキストが空の場合はそのまま画像を返す
+    # textが"Male"で始まる場合、その部分を"man"に置換
+    if text.strip().lower().startswith("male"):
+        text = re.sub(r'^Male', '男性', text.strip(), flags=re.IGNORECASE)
+
     response = translate.translate_text(
         Text=text,
         SourceLanguageCode='auto',
