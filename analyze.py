@@ -18,7 +18,7 @@ translate = boto3.client('translate', region_name=REGION)
 layout = [  [title],
             [image],
             #各種ボタンの追加
-            [recordbutton,celebbutton],[exitbutton]
+            [recordbutton],[exitbutton]
             ]
 
 frame = (DIMW,DIMH)
