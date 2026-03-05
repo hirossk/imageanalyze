@@ -27,7 +27,13 @@ buttonsize = (8,1)
 pad=((7,7),(2,2))
 #画面部品の準備
 title = sg.Text('画像解析デモ', size=(40, 1),  font='Helvetica 20')
-image = sg.Image(filename='', key='image', size=(640, 480))
+import base64
+
+# 1x1 transparent PNG as placeholder
+BLANK_IMAGE = base64.b64decode(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
+)
+image = sg.Image(data=BLANK_IMAGE, key='image', size=(640, 480))
 recordbutton = sg.Button('撮影開始',key='record', size=buttonsize,pad=pad, font=font)
 facebutton = sg.Button('顔検出', key='face',size=buttonsize,pad=pad, font=font)
 labelbutton = sg.Button('物体検出', key='label',size=buttonsize,pad=pad, font=font)
@@ -124,7 +130,7 @@ def call_polly(speed = 85,VoiceId = 'Kazuha',filename = 'message.txt',Engine = '
     #スピードの変更や空白の挿入
     text = '<speak><prosody rate="' + str(speed) + '%">'
     #空白の挿入
-    data = re.sub('bt=(\d+)s','<break time="\\1s"/>',data)
+    data = re.sub(r'bt=(\d+)s', '<break time="\\1s"/>', data)
     data = re.sub('VoiceId',VoiceId,data)
     text = text + data
     text = text + '</prosody></speak>'
