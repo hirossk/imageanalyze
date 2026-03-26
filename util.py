@@ -27,7 +27,7 @@ buttonsize = (8,1)
 pad=((7,7),(2,2))
 #画面部品の準備
 title = sg.Text('画像解析デモ', size=(40, 1),  font='Helvetica 20')
-image = sg.Image(filename='', key='image', size=(640, 480))
+image = sg.Image(filename=BLANK_IMAGE, key='image', size=(640, 480))
 recordbutton = sg.Button('撮影開始',key='record', size=buttonsize,pad=pad, font=font)
 facebutton = sg.Button('顔検出', key='face',size=buttonsize,pad=pad, font=font)
 labelbutton = sg.Button('物体検出', key='label',size=buttonsize,pad=pad, font=font)
