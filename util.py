@@ -15,6 +15,12 @@ import pprint
 
 #東京リージョン
 REGION = 'ap-northeast-1'
+# 変更後
+BEDROCK_MODEL_ID = os.getenv('BEDROCK_MODEL_ID', 'anthropic.claude-sonnet-4-5-20250929-v1:0')
+BEDROCK_INFERENCE_PROFILE_ID = os.getenv(
+    'BEDROCK_INFERENCE_PROFILE_ID',
+    'us.anthropic.claude-sonnet-4-5-20250929-v1:0'  # ← ここがポイント
+)
 polly = boto3.client('polly', region_name=REGION)
 bedrock = boto3.client('bedrock', region_name='us-east-1')
 bedrock_runtime = boto3.client('bedrock-runtime', region_name='us-east-1')
@@ -200,18 +206,27 @@ def invoke_model(model_id, prompt):
         ]
     }
 
-    response = bedrock_runtime.invoke_model(
-        modelId=model_id,
-        body=json.dumps(body).encode('utf-8'),
-        contentType='application/json'
-    )
+    try:
+        response = bedrock_runtime.invoke_model(
+            modelId=model_id,
+            body=json.dumps(body).encode('utf-8'),
+            contentType='application/json'
+        )
+    except ClientError as error:
+        message = str(error)
+        if 'on-demand throughput isn\'t supported' in message or 'inference profile' in message.lower():
+            raise RuntimeError(
+                'このモデルはオンデマンド呼び出し非対応です。'
+                '環境変数 BEDROCK_INFERENCE_PROFILE_ID に Inference Profile のIDまたはARNを設定してください。'
+            ) from error
+        raise
     print(response)
     response_body = json.loads(response['body'].read().decode('utf-8'))
     return response_body
 
 def call_bedrock():
     # モデルIDとプロンプトを設定
-    model_id = "anthropic.claude-3-haiku-20240307-v1:0"
+    model_id = BEDROCK_INFERENCE_PROFILE_ID or BEDROCK_MODEL_ID
 
     f = open('questions.txt', 'r', encoding='UTF-8')
     data = f.read(-1)
@@ -249,6 +264,4 @@ def call_bedrock():
         f.write(answer)
     
     call_polly(filename = 'answer.txt',VoiceId='Takumi')
-
-
 
