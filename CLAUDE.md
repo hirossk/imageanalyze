@@ -72,8 +72,11 @@ Web版の AWS ロジックは util.py と同じ機能を「**画像バイト →
 - `webapp/detectors/` … 検出1機能=1ファイル(`faces`/`labels`/`text`/`japanese`/`celebrities`)。
   `__init__.py` が各関数を集めて `DETECTORS` dict(`face`/`label`/`text`/`trans`/`celeb`/`jaocr`)と `analyze()` を公開。
 - `webapp/speech.py` … 音声合成(Polly)。`webapp/genai.py` … 生成AI(Bedrock、`invoke_bedrock`/`invoke_bedrock_vision`)。
-- `webapp/analysis.py` … **後方互換ファサード**。上記を re-export するだけ(`analysis.DETECTORS` 等の既存参照を維持)。
-  依存方向は `detectors → (core, genai)`、`genai/speech → core` の一方向で循環しない。
+- `webapp/guide.py` … **AIガイド(フィナーレ)**。単体機能を「1枚の写真」を軸に連結する合成レイヤ。
+  `narrate()`=写真を Claude が実況→Polly が読み上げ、`answer_about()`=写真Q&A→回答→読み上げ。
+  生成文をそのまま Polly に渡すため `synthesize_speech(..., use_ssml_breaks=False)` で呼ぶ(SSML誤爆防止)。
+- `webapp/analysis.py` … **後方互換ファサード**。上記(core/detectors/speech/genai)を re-export するだけ(`analysis.DETECTORS` 等の既存参照を維持)。
+  依存方向は `detectors → (core, genai)`、`guide → (core, genai, speech)`、`genai/speech → core` の一方向で循環しない。
 
 `jaocr`(日本語よみとり、`detectors/japanese.py`)だけは Rekognition ではなく **Claude のビジョン機能**
 (`genai.invoke_bedrock_vision()`)を使う。Rekognition の `detect_text` はラテン文字のみ対応で日本語(CJK)を
@@ -88,7 +91,9 @@ Web版の AWS ロジックは util.py と同じ機能を「**画像バイト →
 ### Web版のリクエスト経路
 `webapp/main.py`(FastAPI, ルーティングのみ) → `webapp/analysis.py`(AWS ロジック)。
 フロントの `webapp/static/index.html` は単一ファイルの自己完結 SPA。**サーバ呼び出しは JS の `Api`
-オブジェクトに集約**(`Api.detect/polly/bedrock/features/defaults`)。カメラ/ファイル画像を base64
+オブジェクトに集約**(`Api.detect/polly/bedrock/narrate/photoChat/features/defaults`)。`narrate`/`photoChat`
+は AIガイド用で、JSON に実況/回答テキストと mp3(data URL)を同梱して返す(1回の呼び出しで表示＋再生)。
+カメラ/ファイル画像を base64
 dataURL 化し、`multipart/form-data` の `image` フィールドで送る(カメラ・ファイルとも同一経路)。
 サーバは注釈済み画像を data URL(base64 PNG)で返す(Polly のみバイナリ mp3)。起動時に `/api/features`
 を読み、Step1(input)だけ表示した状態から「次の機能へ」で1つずつ解放する。フォームの初期値

@@ -123,6 +123,25 @@
     <div id="answer"></div>
   </section>
 
+  <!-- AIガイド（フィナーレ：Vision＋音声を写真に連結。初期は非表示） -->
+  <section class="card full locked" id="guideCard">
+    <h2>⑤ AIガイド ― 実況＆おしゃべり（生成AI × 音声の合体）</h2>
+    <p style="color:var(--muted);font-size:13px;margin:0 0 6px">
+      いま取り込んでいる<strong>写真</strong>について、AIが実況し、質問にも声で答えます。
+    </p>
+    <div class="row">
+      <button id="narrate" disabled>この写真を実況する 🎤</button>
+    </div>
+    <div class="field">
+      <input id="guideQuestion" type="text" style="flex:1;min-width:240px"
+             placeholder="この写真について質問（例：何人いる？ 何をしている？）">
+      <button id="askPhoto" disabled>写真について質問</button>
+    </div>
+    <div class="status" id="guideStatus"></div>
+    <div id="guideAnswer" style="white-space:pre-wrap;margin-top:10px;line-height:1.6;font-size:15px"></div>
+    <audio id="guideAudio" controls style="width:100%;margin-top:8px;display:none"></audio>
+  </section>
+
 </main>
 
 <script>
@@ -167,6 +186,21 @@ const Api = {
     const formData = new FormData();
     formData.append("prompt", prompt);
     return this.requestJson("/api/bedrock", { method: "POST", body: formData });
+  },
+
+  // AIガイド：写真を実況（テキスト＋音声を返す）
+  narrate(image) {
+    const formData = new FormData();
+    formData.append("image", image);
+    return this.requestJson("/api/narrate", { method: "POST", body: formData });
+  },
+
+  // AIガイド：写真について質問（テキスト＋音声を返す）
+  photoChat(image, question) {
+    const formData = new FormData();
+    formData.append("image", image);
+    formData.append("question", question);
+    return this.requestJson("/api/photo_chat", { method: "POST", body: formData });
   },
 
   // Polly だけは音声(バイナリ)を返すので特別扱い
@@ -223,6 +257,14 @@ const bedrockStatus = document.getElementById("bedrockStatus");
 const answerElement = document.getElementById("answer");
 const speakAnswerButton = document.getElementById("speakAnswer");
 
+const guideCard = document.getElementById("guideCard");
+const narrateButton = document.getElementById("narrate");
+const askPhotoButton = document.getElementById("askPhoto");
+const guideQuestion = document.getElementById("guideQuestion");
+const guideStatus = document.getElementById("guideStatus");
+const guideAnswer = document.getElementById("guideAnswer");
+const guideAudio = document.getElementById("guideAudio");
+
 const stepTitle = document.getElementById("stepTitle");
 const stepDesc = document.getElementById("stepDesc");
 const stepCounter = document.getElementById("stepCounter");
@@ -259,6 +301,10 @@ function revealFeature(feature) {
   } else if (feature.kind === "bedrock") {
     bedrockCard.classList.remove("locked");
     bedrockCard.classList.add("new-feature");
+  } else if (feature.kind === "guide") {
+    guideCard.classList.remove("locked");
+    guideCard.classList.add("new-feature");
+    updateGuideButtons();
   }
   // input は最初から表示されているので何もしない
 }
@@ -360,6 +406,7 @@ function setImage(dataURL) {
   currentImage = dataURL;
   preview.src = dataURL;
   updateDetectButtons();
+  updateGuideButtons();
   summaryElement.textContent = "";
   resultsElement.textContent = "";
   detectStatus.textContent = "取り込み完了。解放済みの解析ボタンを押してください。";
@@ -371,6 +418,13 @@ function updateDetectButtons() {
   for (let i = 0; i < buttons.length; i++) {
     buttons[i].disabled = (currentImage === null);
   }
+}
+
+// AIガイドのボタンも画像の有無で有効/無効を更新
+function updateGuideButtons() {
+  const disabled = (currentImage === null);
+  narrateButton.disabled = disabled;
+  askPhotoButton.disabled = disabled;
 }
 
 /* ============================================================
@@ -474,6 +528,57 @@ askButton.addEventListener("click", async function () {
 speakAnswerButton.addEventListener("click", function () {
   voiceSelect.value = "Takumi";
   speak(answerElement.textContent, bedrockStatus);
+});
+
+/* ============================================================
+   AIガイド（実況＆写真Q&A：Vision＋音声を写真に連結）
+   ============================================================ */
+function playGuideAudio(dataUrl) {
+  if (!dataUrl) {
+    return;
+  }
+  guideAudio.src = dataUrl;
+  guideAudio.style.display = "block";
+  guideAudio.play();
+}
+
+narrateButton.addEventListener("click", async function () {
+  if (currentImage === null) {
+    showError(guideStatus, "先に写真を取り込んでください。");
+    return;
+  }
+  guideStatus.textContent = "AIが写真を見て実況中...";
+  guideAnswer.textContent = "";
+  try {
+    const data = await Api.narrate(currentImage);
+    guideAnswer.textContent = data.text;
+    playGuideAudio(data.audio);
+    guideStatus.textContent = "";
+  } catch (error) {
+    showError(guideStatus, error.message);
+  }
+});
+
+askPhotoButton.addEventListener("click", async function () {
+  if (currentImage === null) {
+    showError(guideStatus, "先に写真を取り込んでください。");
+    return;
+  }
+  const question = guideQuestion.value.trim();
+  if (!question) {
+    showError(guideStatus, "質問を入力してください。");
+    return;
+  }
+  guideStatus.textContent = "AIが写真を見て考え中...";
+  guideAnswer.textContent = "";
+  try {
+    const data = await Api.photoChat(currentImage, question);
+    guideAnswer.textContent = data.answer;
+    playGuideAudio(data.audio);
+    guideStatus.textContent = "";
+  } catch (error) {
+    showError(guideStatus, error.message);
+  }
 });
 
 /* ============================================================

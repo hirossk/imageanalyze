@@ -61,6 +61,7 @@ webapp/
     faces.py  labels.py  text.py  japanese.py  celebrities.py
   speech.py            音声合成（Polly）
   genai.py             生成AI（Bedrock / Claude）
+  guide.py             AIガイド（実況＋写真Q&A：Vision＋音声を連結するフィナーレ）
   analysis.py          後方互換ファサード（上記を re-export）
   static/index.html    フロントエンド（カメラ・UI 一式、Api クライアント）
   requirements-web.txt 依存関係

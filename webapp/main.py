@@ -17,7 +17,7 @@ from fastapi import FastAPI, Form, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
-from . import analysis, features
+from . import analysis, features, guide
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
@@ -130,6 +130,39 @@ def api_bedrock(prompt: str = Form(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     return {"answer": answer}
+
+
+# ---------------------------------------------------------------------------
+# AIガイド API（写真を軸に Vision＋音声を連結）
+# ---------------------------------------------------------------------------
+def _audio_data_url(mp3_bytes: bytes) -> str:
+    return "data:audio/mpeg;base64," + base64.b64encode(mp3_bytes).decode()
+
+
+@app.post("/api/narrate")
+def api_narrate(image: str = Form(...), voice: str = Form("Kazuha")):
+    """写真を AI が実況し、音声も返す。"""
+    image_bytes = _decode_image(image)
+    try:
+        text, mp3 = guide.narrate(image_bytes, voice_id=voice)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    return {"text": text, "audio": _audio_data_url(mp3)}
+
+
+@app.post("/api/photo_chat")
+def api_photo_chat(
+    image: str = Form(...),
+    question: str = Form(...),
+    voice: str = Form("Kazuha"),
+):
+    """写真についての質問に、AI が写真を見て回答し、音声も返す。"""
+    image_bytes = _decode_image(image)
+    try:
+        text, mp3 = guide.answer_about(image_bytes, question, voice_id=voice)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    return {"answer": text, "audio": _audio_data_url(mp3)}
 
 
 # 静的ファイル（必要になった場合用）

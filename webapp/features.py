@@ -7,7 +7,7 @@
   id    … 機能の識別子
   title … ボタン/見出しに出す名前
   desc  … 観客向けの一言説明（ステップバーに表示）
-  kind  … "input" | "detect" | "polly" | "bedrock"
+  kind  … "input" | "detect" | "polly" | "bedrock" | "guide"
   mode  … kind=="detect" のとき、analysis.DETECTORS のキー
 """
 
@@ -30,6 +30,8 @@ FEATURES = [
      "desc": "文章をAWS Pollyで自然な音声に変換します。"},
     {"id": "bedrock", "title": "生成AI", "kind": "bedrock",
      "desc": "生成AI(Claude)に質問して答えてもらいます。"},
+    {"id": "guide", "title": "AIガイド（実況＆質問）", "kind": "guide",
+     "desc": "AIが写真を見て実況し、質問にも答えます（生成AI＋音声の合体・フィナーレ）。"},
 ]
 
 # step 番号を並び順から自動付与（手で振らなくてよい）
